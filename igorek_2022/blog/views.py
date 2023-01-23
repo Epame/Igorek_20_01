@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 from .models import Post, Comment
 from .forms import CommentForm
@@ -18,31 +19,25 @@ def blog_detail(request, pk):
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = Comment(
-                author=form.changed_data['author'],
-                bode=form.changed_data['body'],
-                post=post
+                author=form.cleaned_data['author'],
+                body=form.cleaned_data['body'],
+                post=post,
             )
             comment.save()
-
     comments = Comment.objects.filter(post=post)
-
     context = {
-        "post": post,
+        #"post": post,
         "comments": comments,
-        'form': form,
-
+        "form": form,
     }
 
     return render(request, "blog_detail.html", context)
 
 
 def blog_category(request, category):
-    post = Post.objects.filter(
-        category__name__contains=category
-    ).order_by('-created_on')
+    posts = Post.objects.filter(categories__name__contains=category).order_by('-created_on')
     context = {
-        'post': post,
-        'category': category,
+        "category": category,
+        #"posts": posts,
     }
     return render(request, "blog_category.html", context)
-
